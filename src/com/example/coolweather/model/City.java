@@ -1,4 +1,4 @@
-package model;
+package com.example.coolweather.model;
 
 public class City {
 
@@ -19,16 +19,16 @@ public class City {
 		return cityName;
 	}
 	
-	public void setCityName(String name){
-		this.cityName = name;
+	public void setCityName(String cityName){
+		this.cityName = cityName;
 	}
 	
 	public String getCityCode(){
 		return cityCode;
 	}
 	
-	public void setCityCode(String code){
-		this.cityCode = code;
+	public void setCityCode(String cityCode){
+		this.cityCode = cityCode;
 	}
 	
 	public int getProvinceId(){
