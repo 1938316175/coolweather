@@ -6,7 +6,10 @@ import java.util.List;
 import android.R.anim;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -41,15 +44,15 @@ public class ChooseAreaActivity extends Activity {
 	private List<String> dataList = new ArrayList<String>();
 	
 	/*
-	 * ʡ�б�
+	 * 省列表
 	 */
 	private List<Province> provinceList;
 	/*
-	 * ���б�
+	 * 市列表
 	 */
 	private List<City> cityList;
 	/*
-	 * ���б�
+	 * 县列表
 	 */
 	private List<County> countyList;
 	/*
@@ -65,9 +68,26 @@ public class ChooseAreaActivity extends Activity {
 	 */
 	private int currentLevel;
 	
+	/*
+	 * 是否从WeatherActivity中跳转过来
+	 */
+	private boolean isFromWeatherActivity;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		
+		isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity", false);
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		//已经选择城市且不是从WeatherActivity跳转过来的，才会直接跳转到WeatherActivity
+		if(prefs.getBoolean("city_selected", false) && !isFromWeatherActivity){
+			Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+			startActivity(intent);
+			finish();
+			return;
+		}
+		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.choose_area);
 		listView = (ListView)findViewById(R.id.list_view);
@@ -88,14 +108,23 @@ public class ChooseAreaActivity extends Activity {
 				else if(currentLevel == LEVEL_CITY){
 					selectedCity = cityList.get(index);
 					queryCounties();
+				}else if (currentLevel == LEVEL_COUNTY) {
+					if(isFromWeatherActivity){
+					//	String countyCode = countyList.get(index).getCountyCode();
+						Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+					//	intent.putExtra("county_code", countyCode);
+					//s	Log.d("wangbin", "ChooseArea" + countyCode);
+						startActivity(intent);
+					}
+				//	finish();
 				}
 			}
 		});
-		queryProvinces();
+		queryProvinces();//加载省级数据
 	}
 	
 	/*
-	 * ���ȴ����ݿ��ѯ��û����ȥ��������ѯ
+	 * 查询省市县
 	 */
 
 	private void queryProvinces() {
